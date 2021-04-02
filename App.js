@@ -1,10 +1,12 @@
+/* 
+Basada en la interfaz grafica de Lucia Scott Dribble. 
+https://dribbble.com/shots/14709020-Calculator/attachments/6408579?mode=media
+*/
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard, Dimensions, StatusBar, ImageBackground, Vibration, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Keyboard, Dimensions, StatusBar, ImageBackground, Vibration, TouchableOpacity } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import calculator from './utils/calculator';
 
 export default function App() {
-
   Keyboard.dismiss()
   useEffect(() => {
     return () => {
@@ -17,7 +19,7 @@ export default function App() {
 
   const Button = ({ char, onPress, value, icon, color }) => {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.8}  >
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
         <View value={value} style={{ width: 70, height: 70, borderRadius: 10, justifyContent: 'center', alignItems: 'center', margin: 15, backgroundColor: '#22252d' }}>
           {
             icon ?
@@ -25,23 +27,96 @@ export default function App() {
               :
               <Text style={{ color: color, fontSize: 30 }}>{char}</Text>
           }
-
         </View>
       </TouchableOpacity>
     )
   }
 
-
   const [state, setState] = useState({
-    currentValue: "0",
+    currentValue: 0,
     operator: null,
     previousValue: null
   })
 
-  console.log(state);
+
+  const handleNumber = (value) => {
+    setState({
+      currentValue: value
+    })
+    if (state.currentValue === null) {
+      setState({
+        ...state,
+        currentValue: value
+      })
+    }
+    return (
+      setState({
+        ...state,
+        currentValue: String(state.currentValue + value)
+      })
+    )
+  };
+
+  const calculator = () => {
+    if (state.operator === '+') {
+      setState({
+        ...state,
+        currentValue: parseFloat(state.previousValue) + parseFloat(state.currentValue)
+      })
+    }
+
+    if (state.operator === '-') {
+      setState({
+        ...state,
+        currentValue: parseFloat(state.previousValue) - parseFloat(state.currentValue)
+      })
+    }
+    if (state.operator === '*') {
+      setState({
+        ...state,
+        currentValue: parseFloat(state.previousValue) * parseFloat(state.currentValue)
+      })
+    }
+    if (state.operator === '/') {
+      setState({
+        ...state,
+        currentValue: parseFloat(state.previousValue) / parseFloat(state.currentValue)
+      })
+    }
+  }
+
   const handleTouch = (type, value) => {
-    Vibration.vibrate(120)
-    setState(state => calculator(type, value, state))
+    Vibration.vibrate(120, 2)
+    switch (type) {
+      case "number":
+        return handleNumber(value)
+      case "operator":
+        return setState({
+          ...state,
+          operator: value,
+          previousValue: parseFloat(state.currentValue),
+          currentValue: 0
+        })
+      case "equal":
+        return calculator()
+      case "clear":
+        return setState({
+          currentValue: 0,
+          operator: null,
+          previousValue: null
+        })
+      case "posneg":
+        return setState({
+          ...state,
+          currentValue: `${parseFloat(state.currentValue) * -1}`
+        })
+      case "percentage":
+        return setState({
+          currentValue: `${parseFloat(state.currentValue) * 0.01}`
+        })
+      default:
+        return state;
+    }
   };
 
   return (

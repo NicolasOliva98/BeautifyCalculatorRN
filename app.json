@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "forexamples",
-    "slug": "forexamples",
+    "name": "beautycalculator",
+    "slug": "beautycalculator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
