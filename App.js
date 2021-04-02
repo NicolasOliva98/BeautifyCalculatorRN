@@ -1,108 +1,115 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard, Dimensions, StatusBar, ImageBackground, Vibration, TouchableOpacity } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { BlurView } from 'expo-blur';
+import calculator from './utils/calculator';
 
 export default function App() {
 
   Keyboard.dismiss()
   useEffect(() => {
-   
     return () => {
     }
   }, [])
 
+  const c1 = '#26fbd4'
+  const c2 = '#d76061'
+  const c3 = '#f6f6f7'
 
-  const Button = ({ char, onPress, value}) => {
+  const Button = ({ char, onPress, value, icon, color }) => {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.5}  >
-      <BlurView value tint='dark' intensity={100} style={{ width: 94, height: 94,borderRadius:10, justifyContent: 'center', alignItems: 'center', margin:2 }} >
-        <Text style={{ color: '#f1f1f1', fontSize: 48 }}>{char}</Text>
-      </BlurView>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8}  >
+        <View value={value} style={{ width: 70, height: 70, borderRadius: 10, justifyContent: 'center', alignItems: 'center', margin: 15, backgroundColor: '#22252d' }}>
+          {
+            icon ?
+              <Icon color={color} name={icon} size={35} />
+              :
+              <Text style={{ color: color, fontSize: 30 }}>{char}</Text>
+          }
+
+        </View>
       </TouchableOpacity>
     )
   }
 
-  const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback
-      onPress={() => Keyboard.dismiss()} accessible={false}>
-      {children}
-    </TouchableWithoutFeedback>
-  );
 
-  const [data, setData] = useState('')
+  const [state, setState] = useState({
+    currentValue: "0",
+    operator: null,
+    previousValue: null
+  })
 
-
-  const handleClick = e => {
-    Vibration.vibrate(35)
-    const value = e
-    switch (value) {
-      case 'clear':
-        setData(data.slice(0,-1))
-        break;
-      case 'equal':
-        calculate();
-        break;
-      default:
-        setData(data+value)
-    }
-
-    }
-
+  console.log(state);
+  const handleTouch = (type, value) => {
+    Vibration.vibrate(120)
+    setState(state => calculator(type, value, state))
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <ImageBackground blurRadius={0} style={styles.container} source={{ uri: 'https://i.imgur.com/QdWIRxX.jpg' }}>
-        <View style={{ flex: 1, padding: 10 }}>
-          <BlurView intensity={100} style={{ width: '100%', height: '20%', padding: 15, borderTopRightRadius: 20, borderTopLeftRadius: 20, marginBottom:10 }}>
-         
-            <Text style={{ fontSize: 75, textAlign: 'right' }}>{data}</Text>
-           
-          </BlurView>
-          <View style={{flexDirection:'row'}}>
-            <Button char='C' />
-            <Button char='+/-' />
-            <Button char='%' />
-            <Button char='X' onPress={() => handleClick('clear')} />
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Button char='7' value='7' />
-            <Button char='8' value='8' />
-            <Button char='9' value='9' />
-            <Button char='/' value='/' />
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Button char='4' value='4' />
-            <Button char='5' value='5' />
-            <Button char='6' value='6' />
-            <Button char='x' value='*' />
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Button char='1' value='1'/>
-            <Button char='2'  value='2'/>
-            <Button char='3' value='3' />
-            <Button char='-' value='-' />
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Button char='0' value='0' onPress={() => handleClick('0')}/>
-            <Button char='.' value='.' onPress={() => handleClick('+')}/>
-            <Button char='=' value='=' onPress={() => handleClick('+')}/>
-            <Button char='+' value='+' onPress={() => handleClick('+')} />
-          </View>
-     
+      <StatusBar backgroundColor='#22252d' />
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <Text style={{ fontSize: 70, textAlign: 'right', fontWeight: 'bold', color: '#fff', marginRight: 8 }}>{state.currentValue}</Text>
         </View>
+        <View style={styles.bottomContainer}>
 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Button char='AC' color={c1} onPress={() => handleTouch('clear')} />
+            <Button icon='plus-minus-variant' color={c1} onPress={() => handleTouch('posneg')} />
+            <Button char='%' color={c1} onPress={() => handleTouch('percentage')} />
+            <Button icon='division' color={c2} onPress={() => handleTouch('operator', '/')} />
+          </View>
 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Button char='7' color={c3} onPress={() => handleTouch('number', 7)} />
+            <Button char='8' color={c3} onPress={() => handleTouch('number', 8)} />
+            <Button char='9' color={c3} onPress={() => handleTouch('number', 9)} />
+            <Button icon='close' color={c2} onPress={() => handleTouch('operator', '*')} />
+          </View>
 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Button char='4' color={c3} onPress={() => handleTouch('number', 4)} />
+            <Button char='5' color={c3} onPress={() => handleTouch('number', 5)} />
+            <Button char='6' color={c3} onPress={() => handleTouch('number', 6)} />
+            <Button icon='minus' color={c2} onPress={() => handleTouch('operator', '-')} />
+          </View>
 
-      </ImageBackground>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Button char='1' color={c3} onPress={() => handleTouch('number', 1)} />
+            <Button char='2' color={c3} onPress={() => handleTouch('number', 2)} />
+            <Button char='3' color={c3} onPress={() => handleTouch('number', 3)} />
+            <Button icon='plus' color={c2} onPress={() => handleTouch('operator', '+')} />
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Button icon='restore' color={c3} onPress={() => handleTouch('clear')} />
+            <Button char='0' color={c3} onPress={() => handleTouch('number', 0)} />
+            <Button icon='circle-small' color={c3} onPress={() => handleTouch('number', '.')} />
+            <Button icon='equal' color={c2} onPress={() => handleTouch('equal')} />
+          </View>
+
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#22252d'
   },
+  topContainer: {
+    flex: 0.8,
+    justifyContent: 'flex-end',
+    backgroundColor: '#22252d',
+    marginBottom: 20
+  },
+  bottomContainer: {
+    flex: 1.5,
+    backgroundColor: '#292d36',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    paddingTop: 20
+  }
 });
